@@ -16,30 +16,31 @@ class TestGame < Test::Unit::TestCase
                  Game.new.load_board('boards/1').get_possible_moves)
   end
 
-  def test_move_left
+  def gen_cases(direction)
     (2..4).each do |i|
       g = Game.new.load_board("boards/#{i}")
-      g.move_left
-      g2 = Game.new.load_board("boards/#{i}l")
+      case direction
+      when 'l'
+        g.move_left
+      when 'r'
+        g.move_right
+      when 'u'
+        g.move_up
+      end
+      g2 = Game.new.load_board("boards/#{i}#{direction}")
       assert_equal(g2, g)
     end
+  end
+
+  def test_move_left
+    gen_cases('l')
   end
 
   def test_move_right
-    (2..4).each do |i|
-      g = Game.new.load_board("boards/#{i}")
-      g.move_right
-      g2 = Game.new.load_board("boards/#{i}r")
-      assert_equal(g2, g)
-    end
+    gen_cases('r')
   end
 
   def test_move_up
-    (2..4).each do |i|
-      g = Game.new.load_board("boards/#{i}")
-      g.move_up
-      g2 = Game.new.load_board("boards/#{i}u")
-      assert_equal(g2, g)
-    end
+    gen_cases('u')
   end
 end
