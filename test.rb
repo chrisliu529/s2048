@@ -26,6 +26,8 @@ class TestGame < Test::Unit::TestCase
         g.move_right
       when 'u'
         g.move_up
+      when 'd'
+        g.move_down
       end
       g2 = Game.new.load_board("boards/#{i}#{direction}")
       assert_equal(g2, g)
@@ -43,4 +45,9 @@ class TestGame < Test::Unit::TestCase
   def test_move_up
     gen_cases('u')
   end
+
+  def test_move_down
+    gen_cases('d')
+  end
+
 end

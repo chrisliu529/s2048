@@ -148,6 +148,32 @@ class Game
   end
 
   def move_down
+    (0..N_ROWS-1).each do |c|
+      numbers = []
+      prev = 0
+      merged = false
+      (0..N_ROWS-1).each do |r|
+        num = @board[N_ROWS-1-r, c]
+        if num != 0
+          if prev == num and not merged
+            numbers.pop
+            numbers.push(2*num)
+            merged = true
+          else
+            numbers.push(num)
+          end
+          prev = num
+        end
+      end
+      n = numbers.length
+      next if n == N_ROWS
+      (N_ROWS-n).times do
+        numbers.push(0)
+      end
+      numbers.each_with_index do |v, i|
+        @board[N_ROWS-1-i, c] = v
+      end
+    end
   end
 
   def add_new_elem
