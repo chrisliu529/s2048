@@ -75,8 +75,8 @@ class Game
           else
             numbers.push(num)
           end
+          prev = num
         end
-        prev = num
       end
       n = numbers.length
       next if n == N_ROWS
@@ -104,8 +104,8 @@ class Game
           else
             numbers.push(num)
           end
+          prev = num
         end
-        prev = num
       end
       n = numbers.length
       next if n == N_ROWS
@@ -121,21 +121,28 @@ class Game
   def move_up
     (0..N_ROWS-1).each do |c|
       numbers = []
+      prev = 0
+      merged = false
       (0..N_ROWS-1).each do |r|
         num = @board[r, c]
         if num != 0
-          numbers.push(num)
+          if prev == num and not merged
+            numbers.pop
+            numbers.push(2*num)
+            merged = true
+          else
+            numbers.push(num)
+          end
+          prev = num
         end
       end
       n = numbers.length
-      if n == N_ROWS
-        next
+      next if n == N_ROWS
+      (N_ROWS-n).times do
+        numbers.push(0)
       end
-      (0..n-1).each do |i|
-#        set_grid(, numbers[i])
-      end
-      (0..N_ROWS-1-n).each do |i|
-        set_grid(r*N_ROWS+i, 0)
+      numbers.each_with_index do |v, i|
+        @board[i, c] = v
       end
     end
   end

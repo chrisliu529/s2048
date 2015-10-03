@@ -21,7 +21,7 @@ class TestGame < Test::Unit::TestCase
       g = Game.new.load_board("boards/#{i}")
       g.move_left
       g2 = Game.new.load_board("boards/#{i}l")
-      assert_equal(g, g2)
+      assert_equal(g2, g)
     end
   end
 
@@ -30,8 +30,16 @@ class TestGame < Test::Unit::TestCase
       g = Game.new.load_board("boards/#{i}")
       g.move_right
       g2 = Game.new.load_board("boards/#{i}r")
-      assert_equal(g, g2)
+      assert_equal(g2, g)
     end
   end
 
+  def test_move_up
+    (2..4).each do |i|
+      g = Game.new.load_board("boards/#{i}")
+      g.move_up
+      g2 = Game.new.load_board("boards/#{i}u")
+      assert_equal(g2, g)
+    end
+  end
 end
