@@ -1,4 +1,4 @@
-require_relative "main"
+require_relative "game"
 require "test/unit"
 
 class TestGame < Test::Unit::TestCase
@@ -12,8 +12,26 @@ class TestGame < Test::Unit::TestCase
   end
 
   def test_get_possible_moves
-    g = Game.new.load_board('boards/1')
-    arr = g.get_possible_moves
-    assert_equal([:left, :right, :up, :down],  arr)
+    assert_equal([:left, :right, :up, :down],
+                 Game.new.load_board('boards/1').get_possible_moves)
   end
+
+  def test_move_left
+    (2..4).each do |i|
+      g = Game.new.load_board("boards/#{i}")
+      g.move_left
+      g2 = Game.new.load_board("boards/#{i}l")
+      assert_equal(g, g2)
+    end
+  end
+
+  def test_move_right
+    (2..4).each do |i|
+      g = Game.new.load_board("boards/#{i}")
+      g.move_right
+      g2 = Game.new.load_board("boards/#{i}r")
+      assert_equal(g, g2)
+    end
+  end
+
 end
