@@ -12,12 +12,10 @@ class TestGame < Test::Unit::TestCase
   end
 
   def test_get_possible_moves
-    assert_equal([:left, :right, :up, :down],
-                 Game.new.load_board('boards/1').get_possible_moves)
-    assert_equal([:left, :right, :up, :down],
-                 Game.new.load_board('boards/a').get_possible_moves)
-    assert_equal([:left, :right, :up, :down],
-                 Game.new.load_board('boards/5').get_possible_moves)
+    ['1', 'a', '5'].each do |f|
+      assert_equal([:left, :right, :up, :down],
+                   Game.new.load_board("boards/#{f}").get_possible_moves)
+    end
   end
 
   def gen_cases(direction)
