@@ -16,6 +16,8 @@ class TestGame < Test::Unit::TestCase
                  Game.new.load_board('boards/1').get_possible_moves)
     assert_equal([:left, :right, :up, :down],
                  Game.new.load_board('boards/a').get_possible_moves)
+    assert_equal([:left, :right, :up, :down],
+                 Game.new.load_board('boards/5').get_possible_moves)
   end
 
   def gen_cases(direction)

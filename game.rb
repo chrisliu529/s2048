@@ -191,11 +191,21 @@ class Game
       :left => method(:scan_left),
       :right => method(:scan_right),
       :up => method(:scan_up),
-      :down => method(:scan_down)
+      :down => method(:scan_down),
+      :row => method(:scan_row),
+      :col => method(:scan_col)
     }
     scanners.each do |k, v|
       if v.call
-        result.push2(k)
+        if k == :row
+          result.push2(:left)
+          result.push2(:right)
+        elsif k == :col
+          result.push2(:up)
+          result.push2(:down)
+        else
+          result.push2(k)
+        end
       end
     end
     result
@@ -280,6 +290,32 @@ class Game
             return true
           end
         end
+      end
+    end
+    false
+  end
+
+  def scan_row
+    (0..N_ROWS-1).each do |r|
+      prev = 0
+      (0..N_ROWS-1).each do |c|
+        cur = @board[r, c]
+        next if cur == 0
+        return true if cur == prev
+        prev = cur
+      end
+    end
+    false
+  end
+
+  def scan_col
+    (0..N_ROWS-1).each do |c|
+      prev = 0
+      (0..N_ROWS-1).each do |r|
+        cur = @board[r, c]
+        next if cur == 0
+        return true if cur == prev
+        prev = cur
       end
     end
     false
