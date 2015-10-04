@@ -14,6 +14,8 @@ class TestGame < Test::Unit::TestCase
   def test_get_possible_moves
     assert_equal([:left, :right, :up, :down],
                  Game.new.load_board('boards/1').get_possible_moves)
+    assert_equal([:left, :right, :up, :down],
+                 Game.new.load_board('boards/a').get_possible_moves)
   end
 
   def gen_cases(direction)
@@ -34,20 +36,9 @@ class TestGame < Test::Unit::TestCase
     end
   end
 
-  def test_move_left
-    gen_cases('l')
+  def test_move
+    'lrud'.split('').each do |c|
+      gen_cases(c)
+    end
   end
-
-  def test_move_right
-    gen_cases('r')
-  end
-
-  def test_move_up
-    gen_cases('u')
-  end
-
-  def test_move_down
-    gen_cases('d')
-  end
-
 end

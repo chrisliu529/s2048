@@ -46,8 +46,7 @@ class Game
   end
 
   def choose_move(moves)
-    :right
-    #moves[Random.rand(moves.length)]
+    moves[Random.rand(moves.length)]
   end
 
   def move_to(direction)
@@ -177,6 +176,13 @@ class Game
   end
 
   def add_new_elem
+    empty_pos = []
+    @board.each_with_index do |e, r, c|
+      if e == 0
+        empty_pos.push(r*N_ROWS + c)
+      end
+    end
+    set_grid(empty_pos[Random.rand(empty_pos.length)], 2*Random.rand(2))
   end
 
   def get_possible_moves
@@ -196,57 +202,85 @@ class Game
   end
 
   def scan_left
-    (0..N_ROWS-1).each do |c|
-      result = true
-      (0..N_ROWS-2).each do |r|
-        if @board[r, c] != 0
-          result = false
-          break
+    (0..N_ROWS-1).each do |r|
+      state = nil
+      (0..N_ROWS-1).each do |c|
+        case state
+        when nil, :found_number
+          if @board[r, c] == 0
+            state = :found_empty
+          else
+            state = :found_number
+          end
+        when :found_empty
+          if @board[r, c] != 0
+            return true
+          end
         end
       end
-      return result if result
     end
     false
   end
 
   def scan_right
-    (1..N_ROWS).each do |c|
-      result = true
-      (0..N_ROWS-1).each do |r|
-        if @board[r, c] != 0
-          result = false
-          break
+    (0..N_ROWS-1).each do |r|
+      state = nil
+      (0..N_ROWS-1).each do |c|
+        case state
+        when nil, :found_empty
+          if @board[r, c] == 0
+            state = :found_empty
+          else
+            state = :found_number
+          end
+        when :found_number
+          if @board[r, c] == 0
+            return true
+          end
         end
       end
-      return result if result
     end
     false
   end
 
   def scan_up
-    (1..N_ROWS).each do |r|
-      result = true
-      (0..N_ROWS-1).each do |c|
-        if @board[r, c] != 0
-          result = false
-          break
+    (0..N_ROWS-1).each do |c|
+      state = nil
+      (0..N_ROWS-1).each do |r|
+        case state
+        when nil, :found_number
+          if @board[r, c] == 0
+            state = :found_empty
+          else
+            state = :found_number
+          end
+        when :found_empty
+          if @board[r, c] != 0
+            return true
+          end
         end
       end
-      return result if result
     end
     false
   end
 
   def scan_down
-    (0..N_ROWS-2).each do |r|
-      result = true
-      (0..N_ROWS-1).each do |c|
-        if @board[r, c] != 0
-          result = false
-          break
+    (0..N_ROWS-1).each do |c|
+      state = nil
+      (0..N_ROWS-1).each do |r|
+        case state
+        when nil, :found_empty
+          if @board[r, c] == 0
+            state = :found_empty
+          else
+            state = :found_number
+          end
+        when :found_number
+          if @board[r, c] == 0
+            return true
+          end
         end
       end
-      return result if result
     end
     false
   end
