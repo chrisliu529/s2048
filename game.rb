@@ -188,7 +188,7 @@ class Game
         empty_pos.push(r*N_ROWS + c)
       end
     end
-    set_grid(empty_pos[Random.rand(empty_pos.length)], 2*Random.rand(2))
+    set_grid(empty_pos[Random.rand(empty_pos.length)], 2*(1+Random.rand(2)))
   end
 
   def get_possible_moves
