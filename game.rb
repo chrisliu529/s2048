@@ -40,9 +40,15 @@ class Game
   def move
     @moves += 1
     possible_moves = get_possible_moves()
-    next_move = choose_move(possible_moves)
-    move_to(next_move)
-    add_new_elem()
+    if possible_moves.length > 0
+      next_move = choose_move(possible_moves)
+      puts "==== move #{next_move} ===="
+      move_to(next_move)
+      add_new_elem()
+      true
+    else
+      false
+    end
   end
 
   def choose_move(moves)
@@ -353,5 +359,13 @@ class Game
 
   def ==(another)
     @board == another.board
+  end
+
+  def max
+    result = 0
+    @board.each do |e|
+      result = e if e > result
+    end
+    result
   end
 end
