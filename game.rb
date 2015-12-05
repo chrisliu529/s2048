@@ -24,6 +24,7 @@ class Game
   def initialize
     @board = Matrix.zero(N_ROWS)
     @moves = 0
+    @move_tags = {left: "L", right: "R", up: "U", down:"D"}
     arr = []
     while arr.length < 3 do
       arr.push2(Random.rand(N_GRIDS))
@@ -42,7 +43,7 @@ class Game
     possible_moves = get_possible_moves()
     if possible_moves.length > 0
       next_move = choose_move(possible_moves)
-      puts "==== move #{next_move} ===="
+      puts "#{@move_tags[next_move]}"
       move_to(next_move)
       add_new_elem()
       true
@@ -348,7 +349,7 @@ class Game
   end
 
   def print_board
-    puts "=================#{@moves}================"
+    STDERR.puts "=================#{@moves}===="
     @board.to_a.each do |r|
       r.each do|e|
         print "|#{e}|"

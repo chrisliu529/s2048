@@ -1,10 +1,12 @@
 require_relative "game"
 
 g = Game.new
+puts "I"
 g.print_board
 
 while g.move do
   g.print_board
 end
 
-puts "==== GAME OVER (#{g.max}) ===="
+puts "E"
+STDERR.puts "==== GAME OVER (#{g.max}) ===="
