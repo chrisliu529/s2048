@@ -1,5 +1,27 @@
 require 'yaml'
 require 'scanf'
+require 'erb'
+
+class GenericTemplate
+  include ERB::Util
+  attr_accessor :items, :template, :date
+
+  def initialize(items, template, date=Time.now)
+    @date = date
+    @items = items
+    @template = template
+  end
+
+  def render()
+    ERB.new(@template).result(binding)
+  end
+
+  def save(file)
+    File.open(file, "w+") do |f|
+      f.write(render)
+    end
+  end
+end
 
 module AdaCmpVerify
   class Context
@@ -100,6 +122,8 @@ end
 
 def main
   config = YAML.load_file('config.yml')
+  records = []
+  max_score = 0
   config['times'].to_i.times do |i|
     puts "=== running #{i} ==="
     out_file = "run#{i}.txt"
@@ -110,15 +134,19 @@ def main
     p.parse
     err = p.result[:error]
     if err.nil?
-      puts "score: #{p.result[:score]}"
-      puts "moves: #{p.result[:moves]}"
-      puts "elapsed time: #{"%.3f" % elapsed} sec"
-      puts "record: #{out_file}"
+      score = p.result[:score]
+      max_score = score if score > max_score
+      records << {score: score, moves: p.result[:moves],
+        elapsed: elapsed, output: out_file}
     else
       puts"error: #{err} in #{i} run"
       return
     end
   end
+  puts records
+  report_html =
+    GenericTemplate.new({max_score: max_score, records: records}, File.read('report.html.erb'))
+  report_html.save('report.html')
 end
 
 main

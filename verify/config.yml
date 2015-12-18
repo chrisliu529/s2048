@@ -1,2 +1,2 @@
-times: 2
+times: 10
 cmd: ruby ../main.rb
