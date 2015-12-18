@@ -16,6 +16,11 @@ module AdaCmpVerify
       #fake imp
       true
     end
+
+    def score
+      arr = @board.flatten.sort { |x,y| y <=> x }
+      arr[0] + arr[1]
+    end
   end
 
   class FileParser
@@ -26,7 +31,7 @@ module AdaCmpVerify
       @result = {}
     end
 
-    def read_line()
+    def read_line
       s = @infile.gets
       s.strip if not s.nil?
     end
@@ -39,16 +44,25 @@ module AdaCmpVerify
         if row.length == 4
           rows.push(row)
         else
-          abort("Line##{line_no + i} unexpected line:#{line}")
+          raise("Line##{line_no + i} unexpected line:#{line}")
         end
       end
       return rows
     end
 
-    def parse()
+    def parse
+      begin
+        @result = do_parse()
+      rescue RuntimeError => err
+        @result[:error] = err
+      end
+    end
+
+    def do_parse
       state = :init
       line_no = 1
       moves = {"U" => :up, "D" => :down, "L" => :left, "R" => :right}
+      move_cnt = 0
       while (true)
         case state
         when :init
@@ -72,9 +86,10 @@ module AdaCmpVerify
             raise("Line##{line_no} illegal move:#{line}") if move.nil?
             context.check_sanity(move, read_board(line_no))
             line_no += 4
+            move_cnt += 1
           end
         when :done
-          return :ok
+          return {moves: move_cnt, score: context.score}
         else
           abort("unknown state: #{state}")
         end
@@ -83,21 +98,27 @@ module AdaCmpVerify
   end
 end
 
-config = YAML.load_file('config.yml')
-config['times'].to_i.times do |i|
-  out_file = "run#{i}.txt"
-  t0 = Time.now
-  %x{#{config['cmd']} > #{out_file}}
-  elapsed = Time.now - t0
-  p = AdaCmpVerify::FileParser.new(out_file)
-  p.parse
-  err = p.result[:error]
-  if err.nil?
-    puts "score: #{p.result[:score]}"
-    puts "moves: #{p.result[:moves]}"
-    puts "elapsed time: #{"%.3f" % elapsed} sec"
-    puts "record: #{out_file}"
-  else
-    puts"error: #{err}"
+def main
+  config = YAML.load_file('config.yml')
+  config['times'].to_i.times do |i|
+    puts "=== running #{i} ==="
+    out_file = "run#{i}.txt"
+    t0 = Time.now
+    %x{#{config['cmd']} > #{out_file}}
+    elapsed = Time.now - t0
+    p = AdaCmpVerify::FileParser.new(out_file)
+    p.parse
+    err = p.result[:error]
+    if err.nil?
+      puts "score: #{p.result[:score]}"
+      puts "moves: #{p.result[:moves]}"
+      puts "elapsed time: #{"%.3f" % elapsed} sec"
+      puts "record: #{out_file}"
+    else
+      puts"error: #{err} in #{i} run"
+      return
+    end
   end
 end
+
+main
