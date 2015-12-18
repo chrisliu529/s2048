@@ -1,2 +1,4 @@
 times: 10
 cmd: ruby ../main.rb
+timeout: 0.1
+

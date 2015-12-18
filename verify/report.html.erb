@@ -346,7 +346,14 @@ sup {
   <% @items[:records].each_with_index do |record, i| %>
   <tr>
     <td><%= i+1 %></td>
-    <td><%= "%.3f" % record[:elapsed] %> sec</td>
+    <%
+    elapsed = record[:elapsed]
+    if elapsed.is_a?(Numeric)
+    %>
+    <td><%= "%.3f" % elapsed %> sec</td>
+    <% else %>
+    <td><%= elapsed %></td>
+    <% end %>
     <td><%= record[:moves] %></td> 
     <td><%= record[:score] %></td>
     <% out_file = record[:output] %>

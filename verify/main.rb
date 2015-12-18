@@ -124,12 +124,19 @@ def main
   config = YAML.load_file('config.yml')
   records = []
   max_score = 0
+  time_cost = 0
   config['times'].to_i.times do |i|
     puts "=== running #{i} ==="
     out_file = "run#{i}.txt"
     t0 = Time.now
     %x{#{config['cmd']} > #{out_file}}
     elapsed = Time.now - t0
+    time_cost += elapsed
+    if time_cost > config['timeout']
+      puts "halt for timeout"
+      records << {elapsed: 'timeout'}
+      break
+    end
     p = AdaCmpVerify::FileParser.new(out_file)
     p.parse
     err = p.result[:error]
