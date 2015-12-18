@@ -130,21 +130,25 @@ def main
     out_file = "run#{i}.txt"
     t0 = Time.now
     pid = Process::spawn("#{config['cmd']} > #{out_file}")
+    watcher = Thread.new {
+      remained_time = config['timeout'] - time_cost
+      sleep remained_time
+      if Process::waitpid(pid, Process::WNOHANG).nil?
+        puts "halt for timeout"
+        puts "kill #{pid}, #{pid + 1}"
+        %x{kill -9 #{pid}}
+        %x{kill -9 #{pid+1}}
+      end
+    }
+    wait_res = Process::waitpid(pid)
+    puts "wait return #{wait_res}"
+    elapsed = Time.now - t0
+    time_cost += elapsed
     remained_time = config['timeout'] - time_cost
-    while remained_time > 0 and Process::waitpid(pid, Process::WNOHANG).nil?
-      sleep 10
-      remained_time -= 10
-    end
     if remained_time <= 0
-      puts "halt for timeout"
-      puts "kill #{pid}, #{pid + 1}"
-      %x{kill -9 #{pid}}
-      %x{kill -9 #{pid+1}}
       records << {elapsed: 'timeout'}
       break
     end
-    elapsed = Time.now - t0
-    time_cost += elapsed
     p = AdaCmpVerify::FileParser.new(out_file)
     p.parse
     err = p.result[:error]
