@@ -25,7 +25,19 @@ end
 
 module AdaCmpVerify
   class Context
+    attr_reader :error
+
     def initialize(rows)
+      cells = []
+      (0..N_ROWS-1).each do |r|
+        (0..N_ROWS-1).each do |c|
+          v = rows[r][c]
+          if v != 0
+            cells << v
+          end
+        end
+      end
+      @error = (not (cells.length == 3 and cells.all? {|x| x == 2}))
       @board = rows
     end
 
@@ -37,14 +49,8 @@ module AdaCmpVerify
         :down => method(:move_down)
       }
       actions[move].call
-      p @board
-      p rows
-      if matched(rows)
-        @board = rows
-        true
-      else
-        false
-      end
+      @error = (not matched(rows))
+      @board = rows
     end
 
     def matched(rows)
@@ -241,6 +247,7 @@ module AdaCmpVerify
         when :read_init_board
           rows = read_board(line_no)
           context = Context.new rows
+          raise('bad init board') if context.error
           line_no += 4
           state = :read_move
         when :read_move
@@ -252,7 +259,8 @@ module AdaCmpVerify
           else
             move = moves[line]
             raise("Line##{line_no} illegal move:#{line}") if move.nil?
-            raise("Line##{line_no} bad transform") if not context.check_sanity(move, read_board(line_no))
+            context.check_sanity(move, read_board(line_no))
+            raise("Line##{line_no} bad transform") if context.error
             line_no += 4
             move_cnt += 1
           end
