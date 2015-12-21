@@ -322,4 +322,18 @@ def main
   report_html.save('report.html')
 end
 
-main
+if ARGV.length == 0
+  main
+elsif ARGV.length == 2
+  if ARGV[0] == "verify"
+    filename = ARGV[1]
+    p = AdaCmpVerify::FileParser.new(filename)
+    p.parse
+    err = p.result[:error]
+    if err.nil?
+      puts "#{filename} verified OK"
+    else
+      puts"error: #{err}"
+    end
+  end
+end
