@@ -30,8 +30,154 @@ module AdaCmpVerify
     end
 
     def check_sanity(move, rows)
-      #fake imp
-      @board = rows
+      actions = {
+        :left => method(:move_left),
+        :right => method(:move_right),
+        :up => method(:move_up),
+        :down => method(:move_down)
+      }
+      actions[move].call
+      p @board
+      p rows
+      if matched(rows)
+        @board = rows
+        true
+      else
+        false
+      end
+    end
+
+    def matched(rows)
+      extra = []
+      (0..N_ROWS-1).each do |r|
+        (0..N_ROWS-1).each do |c|
+          v = rows[r][c]
+          if @board[r][c] != v
+            return false if @board[r][c] != 0
+            extra << v
+          end
+        end
+      end
+      return false if extra.length != 1 or (extra[0] != 2 and extra[0] != 4)
+      true
+    end
+
+    N_ROWS = 4
+
+    def move_left
+      (0..N_ROWS-1).each do |r|
+        numbers = []
+        prev = 0
+        merged = false
+        (0..N_ROWS-1).each do |c|
+          num = @board[r][c]
+          if num != 0
+            if prev == num and not merged
+              numbers.pop
+              numbers.push(2*num)
+              merged = true
+            else
+              numbers.push(num)
+            end
+            prev = num
+          end
+        end
+        n = numbers.length
+        next if n == N_ROWS
+        (N_ROWS-n).times do
+          numbers.push(0)
+        end
+        numbers.each_with_index do |v, i|
+          @board[r][i] = v
+        end
+      end
+    end
+
+    def move_right
+      (0..N_ROWS-1).each do |r|
+        numbers = []
+        prev = 0
+        merged = false
+        (0..N_ROWS-1).each do |c|
+          num = @board[r][N_ROWS-1-c]
+          if num != 0
+            if prev == num and not merged
+              numbers.pop
+              numbers.push(2*num)
+              merged = true
+            else
+              numbers.push(num)
+            end
+            prev = num
+          end
+        end
+        n = numbers.length
+        next if n == N_ROWS
+        (N_ROWS-n).times do
+          numbers.push(0)
+        end
+        numbers.each_with_index do |v, i|
+          @board[r][N_ROWS-1-i] = v
+        end
+      end
+    end
+
+    def move_up
+      (0..N_ROWS-1).each do |c|
+        numbers = []
+        prev = 0
+        merged = false
+        (0..N_ROWS-1).each do |r|
+          num = @board[r][c]
+          if num != 0
+            if prev == num and not merged
+              numbers.pop
+              numbers.push(2*num)
+              merged = true
+            else
+              numbers.push(num)
+            end
+            prev = num
+          end
+        end
+        n = numbers.length
+        next if n == N_ROWS
+        (N_ROWS-n).times do
+          numbers.push(0)
+        end
+        numbers.each_with_index do |v, i|
+          @board[i][c] = v
+        end
+      end
+    end
+
+    def move_down
+      (0..N_ROWS-1).each do |c|
+        numbers = []
+        prev = 0
+        merged = false
+        (0..N_ROWS-1).each do |r|
+          num = @board[N_ROWS-1-r][c]
+          if num != 0
+            if prev == num and not merged
+              numbers.pop
+              numbers.push(2*num)
+              merged = true
+            else
+              numbers.push(num)
+            end
+            prev = num
+          end
+        end
+        n = numbers.length
+        next if n == N_ROWS
+        (N_ROWS-n).times do
+          numbers.push(0)
+        end
+        numbers.each_with_index do |v, i|
+          @board[N_ROWS-1-i][c] = v
+        end
+      end
     end
 
     def check_over
@@ -106,7 +252,7 @@ module AdaCmpVerify
           else
             move = moves[line]
             raise("Line##{line_no} illegal move:#{line}") if move.nil?
-            context.check_sanity(move, read_board(line_no))
+            raise("Line##{line_no} bad transform") if not context.check_sanity(move, read_board(line_no))
             line_no += 4
             move_cnt += 1
           end
