@@ -1,3 +1,6 @@
 times: 10
 cmd: ruby ../main.rb
 timeout: 3
+name: Chris
+time: 2015-12-20 14:23
+lang: ruby

@@ -318,7 +318,14 @@ def main
   end
   puts records
   report_html =
-    GenericTemplate.new({max_score: max_score, records: records}, File.read('report.html.erb'))
+    GenericTemplate.new(
+                        {
+                          name: config['name'],
+                          time: config['time'],
+                          lang: config['lang'],
+                          max_score: max_score,
+                          records: records},
+                        File.read('report.html.erb'))
   report_html.save('report.html')
 end
 
